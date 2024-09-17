@@ -6,7 +6,7 @@ import re
 import collections
 import pkgutil
 from sys import version_info
-import MeCab
+import fugashi
 
 
 """
@@ -20,7 +20,6 @@ Original Perl version by Michal Ptaszynski
 Python version by Yukino Ikegami
 """
 PY2 = True if version_info < (3,) else False
-IS_MECAB_PYTHON3 = bool(getattr(MeCab, "Tagger_version", False))
 
 # cvs stands for "Contextual Valence Shifters"
 RE_PARTICLES = '[だとはでがはもならじゃちってんすあ]*'
@@ -71,7 +70,7 @@ class MLAsk(object):
         """
         if PY2:
             mecab_arg = mecab_arg.encode('utf8')
-        self.mecab = MeCab.Tagger(mecab_arg)
+        self.mecab = fugashi.Tagger(mecab_arg)
         self._read_emodic()
         if not PY2:
             self.mecab.parse('')
@@ -175,10 +174,9 @@ class MLAsk(object):
                 if len(row) < 2:
                     continue
                 surface = row[0]
-                if IS_MECAB_PYTHON3:
-                    features = row[1:]
-                else:
-                    features = row[1].split(',')
+
+                features = row[1:]
+
                 if len(features) > 7:
                     (pos, subpos, lemma) = features[0], features[1], features[6]
                 elif len(features) == 1:
